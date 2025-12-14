@@ -763,15 +763,24 @@ graph LR
 
 **2. Репликация базы данных:**
 ```python
-# settings.py (пример конфигурации master-slave)
+# settings.py (упрощенный пример конфигурации master-slave)
+# В реальной конфигурации добавьте NAME, USER, PASSWORD, PORT
 DATABASES = {
     'default': {  # Master (запись)
         'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sistemakontrol',
+        'USER': 'postgres',
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': 'db-master',
+        'PORT': '5432',
     },
     'replica': {  # Slave (чтение)
         'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sistemakontrol',
+        'USER': 'postgres',
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': 'db-replica',
+        'PORT': '5432',
     }
 }
 
@@ -1687,6 +1696,13 @@ graph TB
 - ✅ Проведено нагрузочное тестирование с Locust (50 пользователей)
 - ✅ Результат: p95 время отклика 37 мс (требование: < 1000 мс)
 - 📋 План масштабирования: Redis кэширование, репликация БД
+
+**Тестовое окружение:**
+- CPU: 2 ядра
+- RAM: 4 GB
+- База данных: PostgreSQL 16 в Docker
+- Веб-сервер: Gunicorn с 4 воркерами
+- Полный отчет: [docs/load-testing.md](docs/load-testing.md)
 
 **Метрики:**
 ```
