@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Проект — {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h1 class="h4 mb-1">{{ project.name }}</h1>
+    <div class="text-muted">{{ project.address }}</div>
+  </div>
+  {% if user.is_manager %}
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" href="{% url 'project_edit' project.id %}">Редактировать</a>
+      <a class="btn btn-outline-danger" href="{% url 'project_delete' project.id %}">Удалить</a>
+    </div>
+  {% endif %}
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <dl class="row mb-0">
+      <dt class="col-sm-4">Дата начала</dt>
+      <dd class="col-sm-8">{{ project.start_date }}</dd>
+      <dt class="col-sm-4">Дата окончания</dt>
+      <dd class="col-sm-8">{{ project.end_date|default:'—' }}</dd>
+    </dl>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h2 class="h6 mb-0">Этапы проекта</h2>
+  {% if user.is_manager %}
+    <a class="btn btn-sm btn-outline-primary" href="{% url 'project_stage_create' project.id %}">Добавить этап</a>
+  {% endif %}
+</div>
+
+<div class="table-responsive mb-3">
+  <table class="table table-sm table-striped align-middle">
+    <thead>
+      <tr>
+        <th>Порядок</th>
+        <th>Название</th>
+        <th>Начало</th>
+        <th>Окончание</th>
+        {% if user.is_manager %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in stages %}
+        <tr>
+          <td>{{ s.order }}</td>
+          <td>{{ s.name }}</td>
+          <td>{{ s.start_date|default:'—' }}</td>
+          <td>{{ s.end_date|default:'—' }}</td>
+          {% if user.is_manager %}
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-secondary" href="{% url 'project_stage_edit' s.id %}">Редактировать</a>
+              <a class="btn btn-sm btn-outline-danger" href="{% url 'project_stage_delete' s.id %}">Удалить</a>
+            </td>
+          {% endif %}
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="5" class="text-muted">Этапы пока не заведены.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2 class="h6">Дефекты проекта</h2>
+<div class="table-responsive">
+  <table class="table table-sm table-striped align-middle">
+    <thead><tr><th>ID</th><th>Заголовок</th><th>Статус</th><th>Приоритет</th><th>Исполнитель</th><th>Deadline</th></tr></thead>
+    <tbody>
+      {% for d in defects %}
+        <tr>
+          <td>{{ d.id }}</td>
+          <td><a href="{% url 'defect_detail' d.id %}">{{ d.title }}</a></td>
+          <td>{{ d.get_status_display }}</td>
+          <td>{{ d.get_priority_display }}</td>
+          <td>{{ d.executor.username|default:'—' }}</td>
+          <td>{{ d.deadline }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-muted">Дефектов пока нет.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

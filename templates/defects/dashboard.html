@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Дашборд — Дефекты{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">Дефекты</h1>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary" href="{% url 'export_defects_csv' %}">Экспорт CSV</a>
+    <a class="btn btn-outline-secondary" href="{% url 'export_defects_xlsx' %}">Экспорт Excel</a>
+    {% if user.is_manager or user.is_customer %}
+      <a class="btn btn-outline-secondary" href="{% url 'analytics' %}">Аналитика</a>
+    {% endif %}
+    {% if user.is_authenticated and not user.is_customer %}
+      <a class="btn btn-primary" href="{% url 'defect_create' %}">Создать дефект</a>
+    {% endif %}
+    {% if user.is_manager %}
+      <a class="btn btn-outline-secondary" href="{% url 'project_create' %}">Создать проект</a>
+    {% endif %}
+  </div>
+</div>
+
+<form class="card card-body mb-3" method="get">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label">Статус</label>
+      <select class="form-select" name="status">
+        <option value="">Все</option>
+        {% for key,label in statuses %}
+          <option value="{{ key }}" {% if filters.status == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">Приоритет</label>
+      <select class="form-select" name="priority">
+        <option value="">Все</option>
+        {% for key,label in priorities %}
+          <option value="{{ key }}" {% if filters.priority == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">Исполнитель</label>
+      <select class="form-select" name="executor" {% if not user.is_manager %}disabled{% endif %}>
+        <option value="">Все</option>
+        {% for u in executors %}
+          <option value="{{ u.id }}" {% if filters.executor|add:'' == u.id|add:'' %}selected{% endif %}>{{ u.username }}</option>
+        {% endfor %}
+      </select>
+      {% if not user.is_manager %}
+        <div class="form-text">Фильтр доступен только менеджеру.</div>
+      {% endif %}
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">Поиск</label>
+      <input class="form-control" name="q" value="{{ filters.q }}" placeholder="заголовок / описание / проект" />
+    </div>
+
+    <div class="col-md-3">
+      <label class="form-label">Сортировка</label>
+      <select class="form-select" name="sort">
+        <option value="-created_at" {% if filters.sort == '-created_at' %}selected{% endif %}>Сначала новые</option>
+        <option value="created_at" {% if filters.sort == 'created_at' %}selected{% endif %}>Сначала старые</option>
+        <option value="deadline" {% if filters.sort == 'deadline' %}selected{% endif %}>Deadline ↑</option>
+        <option value="-deadline" {% if filters.sort == '-deadline' %}selected{% endif %}>Deadline ↓</option>
+      </select>
+    </div>
+
+    <div class="col-12">
+      <button class="btn btn-outline-primary" type="submit">Применить</button>
+      <a class="btn btn-link" href="{% url 'dashboard' %}">Сбросить</a>
+    </div>
+  </div>
+</form>
+
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Проект</th>
+        <th>Заголовок</th>
+        <th>Приоритет</th>
+        <th>Статус</th>
+        <th>Исполнитель</th>
+        <th>Deadline</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for d in defects %}
+      <tr>
+        <td>{{ d.id }}</td>
+        <td>{{ d.project.name }}</td>
+        <td>
+          <a href="{% url 'defect_detail' d.id %}">{{ d.title }}</a>
+          <div class="text-muted small">{{ d.project.address }}</div>
+        </td>
+        <td>{{ d.get_priority_display }}</td>
+        <td>{{ d.get_status_display }}</td>
+        <td>{{ d.executor.username|default:'—' }}</td>
+        <td>{{ d.deadline }}</td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-secondary" href="{% url 'defect_detail' d.id %}">Открыть</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="8" class="text-muted">Дефекты не найдены.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if is_paginated %}
+<nav>
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Назад</span></li>
+    {% endif %}
+
+    <li class="page-item disabled"><span class="page-link">Стр. {{ page_obj.number }} / {{ paginator.num_pages }}</span></li>
+
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Вперёд</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,10 @@
+exclude_dirs:
+  - .venv
+  - tests
+  - "**/migrations/*"
+  - staticfiles
+  - media
+  - logs
+
+# Keep defaults for test selection and severities.
+# (No global skips; we want real findings in app code.)

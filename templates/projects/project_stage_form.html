@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Этап проекта{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Этап проекта</h1>
+
+<form method="post" class="card card-body" novalidate>
+  {% csrf_token %}
+
+  <div class="row g-3">
+    <div class="col-md-8">
+      <label class="form-label">Название</label>
+      {{ form.name }}
+      {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors }}</div>{% endif %}
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Порядок</label>
+      {{ form.order }}
+      {% if form.order.errors %}<div class="text-danger small">{{ form.order.errors }}</div>{% endif %}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Дата начала</label>
+      {{ form.start_date }}
+      {% if form.start_date.errors %}<div class="text-danger small">{{ form.start_date.errors }}</div>{% endif %}
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Дата окончания</label>
+      {{ form.end_date }}
+      {% if form.end_date.errors %}<div class="text-danger small">{{ form.end_date.errors }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="mt-3 d-flex gap-2">
+    <button class="btn btn-primary" type="submit">Сохранить</button>
+    <a class="btn btn-outline-secondary" href="{% url 'project_list' %}">Отмена</a>
+  </div>
+</form>
+{% endblock %}

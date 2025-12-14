@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Аналитика{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">Аналитика: дефекты по статусам</h1>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-body">
+        <canvas id="chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">Таблица</div>
+      <div class="card-body">
+        <table class="table table-sm mb-0">
+          <thead><tr><th>Статус</th><th class="text-end">Кол-во</th></tr></thead>
+          <tbody>
+            {% for label,total in rows %}
+              <tr><td>{{ label }}</td><td class="text-end">{{ total }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+{{ status_labels|json_script:"status-labels" }}
+{{ status_values|json_script:"status-values" }}
+
+<script>
+  const labels = JSON.parse(document.getElementById('status-labels').textContent);
+  const values = JSON.parse(document.getElementById('status-values').textContent);
+  const ctx = document.getElementById('chart');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Количество дефектов',
+        data: values,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+</script>
+{% endblock %}
