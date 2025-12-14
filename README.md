@@ -87,10 +87,10 @@
 
 ```mermaid
 graph LR
-    Client[Client Browser] -->|HTTP/HTTPS| Web[Web Server (Gunicorn)]
-    Web -->|WSGI| App[Django App]
-    App -->|SQL| DB[(PostgreSQL)]
-    App -->|File System| Media[Media Storage]
+    Client["Client Browser"] -->|"HTTP/HTTPS"| Web["Web Server (Gunicorn)"]
+    Web -->|"WSGI"| App["Django App"]
+    App -->|"SQL"| DB[("PostgreSQL")]
+    App -->|"File System"| Media["Media Storage"]
 ```
 
 ### 2. Схема базы данных (ER-диаграмма)
