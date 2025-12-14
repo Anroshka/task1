@@ -53,7 +53,7 @@
 ## 🛠 Технический стек
 
 *   **Backend**: Python 3.13, Django 5.2, Gunicorn
-*   **Database**: PostgreSQL 16
+*   **Database**: PostgreSQL 16 (Docker) / SQLite (Local Dev)
 *   **Infrastructure**: Docker, Docker Compose
 *   **Testing**: Pytest (Unit/Integration), Locust (Load Testing)
 *   **Security**: Argon2 (Password Hashing), Bandit (Security Linter)
@@ -83,13 +83,13 @@
 ## �📊 Визуализация и Архитектура
 
 ### 1. Архитектура приложения
-Классическая монолитная архитектура, упакованная в контейнеры.
+Классическая монолитная архитектура. Поддерживает работу как с **SQLite** (для разработки), так и с **PostgreSQL** (в Docker/Production).
 
 ```mermaid
 graph LR
     Client["Client Browser"] -->|"HTTP/HTTPS"| Web["Web Server (Gunicorn)"]
     Web -->|"WSGI"| App["Django App"]
-    App -->|"SQL"| DB[("PostgreSQL")]
+    App -->|"SQL"| DB[("Database (SQLite / PostgreSQL)")]
     App -->|"File System"| Media["Media Storage"]
 ```
 
